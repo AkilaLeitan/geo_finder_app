@@ -1,0 +1,7 @@
+export enum ErrorCodes {
+    SOMETHING_WENT_WRONG = 1,
+    INVALID_URL = 2,
+    DATABASE_ERROR = 3,
+    DUPLICATE_LINK = 4,
+    LOCATION_NOT_FOUND = 5,
+}
