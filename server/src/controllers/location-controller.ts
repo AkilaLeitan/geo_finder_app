@@ -13,9 +13,9 @@ export class LocationController {
 
     async addLocation(req: Request, res: Response): Promise<void> {
         try {
-            const { name, link, searchBlob, description } = req.body;
+            const { name, link, latitude, longitude, searchBlob, description } = req.body;
 
-            const location: Omit<ILocation, '_id'> = { name, link, searchBlob, description } as Omit<ILocation, '_id'>;
+            const location: Omit<ILocation, '_id'> = { name, link, latitude, longitude, searchBlob, description } as Omit<ILocation, '_id'>;
             const result = await this.service.addLocation(location);
             res.status(201).json(new BaseResponse(true, result, null, 'Location added successfully'));
         } catch (error: any) {
@@ -56,23 +56,21 @@ export class LocationController {
         }
     }
 
-    async findLocationsByString(req: Request, res: Response): Promise<void> {
+    async getLocations(req: Request, res: Response): Promise<void> {
         try {
-            const { search } = req.query;
-            if (!search || typeof search !== 'string') {
-                res.status(400).json(new BaseResponse(false, null, 'INVALID_QUERY', 'Search query is required'));
-                return;
-            }
+            const { searchText, limit, latitude, longitude } = req.query;
 
-            const locations = await this.service.findLocationsByString(search);
-            res.status(200).json(new BaseResponse(true, locations, null, 'Locations fetched successfully'));
+            // Parse limit as a number
+            const parsedLimit = limit ? parseInt(limit as string, 10) : undefined;
+
+            const latitudeNum = latitude ? parseFloat(latitude as string) : undefined;
+            const longitudeNum = longitude ? parseFloat(longitude as string) : undefined;
+
+            const result = await this.service.getLocations(searchText as string, parsedLimit);
+            res.status(200).json(new BaseResponse(true, result, null, 'Locations fetched successfully'));
         } catch (error: any) {
-            console.error('Error get location by search:', error);
-            if (error.message === ErrorCodes.LOCATION_NOT_FOUND.toString()) {
-                res.status(404).json(new BaseResponse(false, null, ErrorCodes.LOCATION_NOT_FOUND.toString(), 'Location not found'));
-            } else {
-                res.status(500).json(new BaseResponse(false, null, ErrorCodes.SOMETHING_WENT_WRONG.toString(), 'Something went wrong'));
-            }
+            console.error('Error fetching locations:', error);
+            res.status(500).json(new BaseResponse(false, null, ErrorCodes.SOMETHING_WENT_WRONG.toString(), 'Something went wrong'));
         }
     }
 

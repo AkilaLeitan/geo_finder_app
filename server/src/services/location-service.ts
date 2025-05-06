@@ -45,15 +45,8 @@ export class LocationService {
         return location;
     }
 
-    async findLocationsByString(searchString: string): Promise<ILocation[]> {
-        const lowerCaseString = searchString.toLowerCase(); // Convert string to lowercase
-        const locations = await this.repository.findLocationsByString(lowerCaseString);
-
-        if (locations && locations.length > 0) {
-            return locations;
-        } else {
-            throw new Error(ErrorCodes.LOCATION_NOT_FOUND.toString());
-        }
+    async getLocations(searchText?: string, limit?: number): Promise<{ locations: ILocation[]; total: number }> {
+        return await this.repository.findLocations(searchText, limit);
     }
 
     async upsertLocation(id: string, location: Omit<ILocation, '_id'>): Promise<ILocation> {

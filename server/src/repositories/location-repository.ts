@@ -18,14 +18,27 @@ export class LocationRepository {
         return await LocationModel.findById(id).exec(); // Fetch location by ID
     }
 
-    async findLocationsByString(searchString: string): Promise<ILocation[]> {
-        const regex = new RegExp(searchString, 'i'); // Case-insensitive regex
-        return await LocationModel.find({
-            $or: [
-                { name: regex }, // Search in the `name` field
-                { searchBlob: { $regex: regex } }, // Search in the `searchBlob` array
-            ],
-        }).exec();
+    async findLocations(searchText?: string, limit?: number): Promise<{ locations: ILocation[]; total: number }> {
+        const query: any = {};
+
+        // If searchText is provided, search in `name` and `searchBlob`
+        if (searchText) {
+            const regex = new RegExp(searchText.toLowerCase(), 'i'); // Case-insensitive regex
+            query.$or = [
+                { name: regex },
+                { searchBlob: { $regex: regex } },
+            ];
+        }
+
+        // Get total count of matching documents
+        const total = await LocationModel.countDocuments(query).exec();
+
+        // Fetch locations with optional limit
+        const locations = await LocationModel.find(query)
+            .limit(limit || 0) // Apply limit if provided
+            .exec();
+
+        return { locations, total };
     }
 
     async upsertLocation(id: string, updateData: UpdateQuery<ILocation>): Promise<ILocation | null> {
@@ -39,5 +52,5 @@ export class LocationRepository {
     async deleteLocationById(id: string): Promise<ILocation | null> {
         return await LocationModel.findByIdAndDelete(id).exec(); // Delete location by ID
     }
-    
+
 }
