@@ -1,0 +1,45 @@
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease-in-out;
+
+    &-info {
+        background-color: #2196f3;
+    }
+
+    &-warning {
+        background-color: #ff9800;
+    }
+
+    &-danger {
+        background-color: #f44336;
+    }
+
+    .toast-close-button {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 14px;
+        margin-top: 10px;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
